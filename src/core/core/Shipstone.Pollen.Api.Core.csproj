@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <ItemGroup>
-    <ProjectReference Include="..\abstractions\Shipstone.Pollen.Api.Core.Abstractions.csproj" />
+    <ProjectReference Include="..\..\infrastructure\abstractions\Shipstone.Pollen.Api.Infrastructure.Abstractions.csproj" />
   </ItemGroup>
 
   <PropertyGroup>
