@@ -8,10 +8,10 @@ partial class ForecastResponse
     {
         internal sealed partial class PollenTypeInfoModel
         {
-            internal String _code;
+            internal String? _code;
             internal ForecastResponse.DailyInfoModel.PollenTypeInfoModel.IndexInfoModel? _indexInfo;
 
-            public String Code
+            public String? Code
             {
                 set => this._code = value;
             }

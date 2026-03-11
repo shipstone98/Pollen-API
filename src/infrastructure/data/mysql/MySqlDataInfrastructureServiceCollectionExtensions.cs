@@ -16,7 +16,7 @@ public static class MySqlDataInfrastructureServiceCollectionExtensions
     /// Registers Pollen MySQL data infrastructure services with the specified <see cref="IServiceCollection" />.
     /// </summary>
     /// <param name="services">The <see cref="IServiceCollection" /> to register services with.</param>
-    /// <param name="connectionString">The connection string for the MySQL instance, or <c>null</c>.
+    /// <param name="connectionString">The connection string for the MySQL instance, or <c>null</c>.</param>
     /// <returns>A reference to <c><paramref name="services" /></c> that can be further used to register services.</returns>
     /// <exception cref="ArgumentNullException"><c><paramref name="services" /></c> is <c>null</c>.</exception>
     public static IServiceCollection AddPollenInfrastructureDataMySql(

@@ -10,10 +10,10 @@ partial class ForecastResponse
         {
             internal sealed class IndexInfoModel
             {
-                internal String _category;
+                internal String? _category;
                 internal ColorResponse? _color;
 
-                public String Category
+                public String? Category
                 {
                     set => this._category = value;
                 }

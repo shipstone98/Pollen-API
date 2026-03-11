@@ -130,7 +130,9 @@ internal sealed class WeatherService : IWeatherService
         if (pollenTypeInfo._indexInfo is not null)
         {
             category =
-                WeatherService.GetCategory(pollenTypeInfo._indexInfo._category);
+                pollenTypeInfo._indexInfo._category is null
+                    ? PollenCategory.None
+                    : WeatherService.GetCategory(pollenTypeInfo._indexInfo._category);
 
             color =
                 pollenTypeInfo._indexInfo._color is null
