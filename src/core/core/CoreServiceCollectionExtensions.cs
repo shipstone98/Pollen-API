@@ -1,0 +1,30 @@
+using System;
+using Microsoft.Extensions.DependencyInjection;
+
+using Shipstone.Pollen.Api.Core.Accounts;
+using Shipstone.Pollen.Api.Core.Pollen;
+using Shipstone.Pollen.Api.Core.Services;
+
+namespace Shipstone.Pollen.Api.Core;
+
+/// <summary>
+/// Provides a set of <c>static</c> (<c>Shared</c> in Visual Basic) methods for registering services with objects that implement <see cref="IServiceCollection" />.
+/// </summary>
+public static class CoreServiceCollectionExtensions
+{
+    /// <summary>
+    /// Registers Pollen core services with the specified <see cref="IServiceCollection" />.
+    /// </summary>
+    /// <param name="services">The <see cref="IServiceCollection" /> to register services with.</param>
+    /// <returns>A reference to <c><paramref name="services" /></c> that can be further used to register services.</returns>
+    /// <exception cref="ArgumentNullException"><c><paramref name="services" /></c> is <c>null</c>.</exception>
+    public static IServiceCollection AddPollenCore(this IServiceCollection services)
+    {
+        ArgumentNullException.ThrowIfNull(services);
+
+        return services
+            .AddSingleton<ICoordinateService, CoordinateService>()
+            .AddScoped<IAccountAuthenticateHandler, AccountAuthenticateHandler>()
+            .AddScoped<IPollenListHandler, PollenListHandler>();
+    }
+}

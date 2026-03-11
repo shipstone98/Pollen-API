@@ -6,7 +6,17 @@
 
   <ItemGroup>
     <ProjectReference Include="..\core\core\Shipstone.Pollen.Api.Core.csproj" />
+    <ProjectReference Include="..\infrastructure\data\mysql\Shipstone.Pollen.Api.Infrastructure.Data.MySql.csproj" />
     <ProjectReference Include="..\infrastructure\weather\Shipstone.Pollen.Api.Infrastructure.Weather.csproj" />
     <ProjectReference Include="..\web\Shipstone.Pollen.Api.Web.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.13">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+
+    <PackageReference Include="Shipstone.AspNetCore" Version="9.0.1" />
   </ItemGroup>
 </Project>
