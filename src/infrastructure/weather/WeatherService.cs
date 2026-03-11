@@ -138,9 +138,9 @@ internal sealed class WeatherService : IWeatherService
                 pollenTypeInfo._indexInfo._color is null
                     ? new()
                     : Color.FromArgb(
-                        (int) (pollenTypeInfo._indexInfo._color._red * 256),
-                        (int) (pollenTypeInfo._indexInfo._color._green * 256),
-                        (int) (pollenTypeInfo._indexInfo._color._blue * 256)
+                        (int) (pollenTypeInfo._indexInfo._color._red * 255),
+                        (int) (pollenTypeInfo._indexInfo._color._green * 255),
+                        (int) (pollenTypeInfo._indexInfo._color._blue * 255)
                     );
         }
 

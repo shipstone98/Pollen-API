@@ -204,7 +204,7 @@ public sealed class WeatherServiceTest
                 stream._closeAction = () => { };
 
                 IEnumerable<byte> dataBytes =
-                    Encoding.UTF8.GetBytes($"{{\"dailyInfo\":[{{\"pollenTypeInfo\":[{{\"code\":\"GRASS\",\"indexInfo\":{{\"category\":\"Moderate\",\"color\":{{\"red\":{GRASS_POLLEN_COLOR_RED / 256.0},\"green\":{GRASS_POLLEN_COLOR_GREEN / 256.0},\"blue\":{GRASS_POLLEN_COLOR_BLUE / 256.0}}}}}}},{{\"code\":\"TREE\",\"indexInfo\":{{\"category\":\"Very Low\",\"color\":{{\"red\":{TREE_POLLEN_COLOR_RED / 256.0},\"green\":{TREE_POLLEN_COLOR_GREEN / 256.0},\"blue\":{TREE_POLLEN_COLOR_BLUE / 256.0}}}}}}},{{\"code\":\"WEED\",\"indexInfo\":{{\"category\":\"Very High\",\"color\":{{\"red\":{WEED_POLLEN_COLOR_RED / 256.0},\"green\":{WEED_POLLEN_COLOR_GREEN / 256.0},\"blue\":{WEED_POLLEN_COLOR_BLUE / 256.0}}}}}}}]}}]}}");
+                    Encoding.UTF8.GetBytes($"{{\"dailyInfo\":[{{\"pollenTypeInfo\":[{{\"code\":\"GRASS\",\"indexInfo\":{{\"category\":\"Moderate\",\"color\":{{\"red\":{GRASS_POLLEN_COLOR_RED / 255.0},\"green\":{GRASS_POLLEN_COLOR_GREEN / 255.0},\"blue\":{GRASS_POLLEN_COLOR_BLUE / 255.0}}}}}}},{{\"code\":\"TREE\",\"indexInfo\":{{\"category\":\"Very Low\",\"color\":{{\"red\":{TREE_POLLEN_COLOR_RED / 255.0},\"green\":{TREE_POLLEN_COLOR_GREEN / 255.0},\"blue\":{TREE_POLLEN_COLOR_BLUE / 255.0}}}}}}},{{\"code\":\"WEED\",\"indexInfo\":{{\"category\":\"Very High\",\"color\":{{\"red\":{WEED_POLLEN_COLOR_RED / 255.0},\"green\":{WEED_POLLEN_COLOR_GREEN / 255.0},\"blue\":{WEED_POLLEN_COLOR_BLUE / 255.0}}}}}}}]}}]}}");
 
                 Queue<byte> queue = new(dataBytes);
 
