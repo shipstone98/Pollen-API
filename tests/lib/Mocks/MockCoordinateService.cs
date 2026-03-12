@@ -2,11 +2,11 @@ using System;
 
 using Shipstone.Pollen.Api.Core.Services;
 
-namespace Shipstone.Pollen.Api.Infrastructure.WeatherTest.Mocks;
+namespace Shipstone.Pollen.Api.Test.Mocks;
 
-internal sealed class MockCoordinateService : ICoordinateService
+public sealed class MockCoordinateService : ICoordinateService
 {
-    internal Func<double, double, (double Latitude, double Longitude)> _normalizeFunc;
+    public Func<double, double, (double Latitude, double Longitude)> _normalizeFunc;
 
     public MockCoordinateService() =>
         this._normalizeFunc = (_, _) => throw new NotImplementedException();

@@ -1,10 +1,10 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading;
 
 using Shipstone.Utilities.Linq;
+using Shipstone.Utilities.Threading.Tasks;
 
 using Shipstone.Pollen.Api.Core.Services;
 using Shipstone.Pollen.Api.Infrastructure.Data;
@@ -15,53 +15,22 @@ namespace Shipstone.Pollen.Api.Core.Pollen;
 
 internal sealed class PollenListHandler : IPollenListHandler
 {
+    private readonly ICacheService _cache;
     private readonly ICoordinateService _coordinate;
-    private readonly IRepository _repository;
     private readonly IWeatherService _weather;
 
     public PollenListHandler(
-        IRepository repository,
+        ICacheService cache,
         ICoordinateService coordinate,
         IWeatherService weather
     )
     {
-        ArgumentNullException.ThrowIfNull(repository);
+        ArgumentNullException.ThrowIfNull(cache);
         ArgumentNullException.ThrowIfNull(coordinate);
         ArgumentNullException.ThrowIfNull(weather);
+        this._cache = cache;
         this._coordinate = coordinate;
-        this._repository = repository;
         this._weather = weather;
-    }
-
-    private async IAsyncEnumerable<WeatherForecastEntity> CreateAsync(
-        double latitude,
-        double longitude,
-        [EnumeratorCancellation] CancellationToken cancellationToken
-    )
-    {
-        IEnumerable<WeatherForecastEntity> weatherForecasts =
-            await this._weather.ListForecastsAsync(
-                latitude,
-                longitude,
-                cancellationToken
-            );
-
-        if (!weatherForecasts.Any())
-        {
-            yield break;
-        }
-
-        foreach (WeatherForecastEntity weatherForecast in weatherForecasts)
-        {
-            await this._repository.WeatherForecasts.CreateAsync(
-                weatherForecast,
-                cancellationToken
-            );
-
-            yield return weatherForecast;
-        }
-
-        await this._repository.SaveAsync(cancellationToken);
     }
 
     private async IAsyncEnumerable<IPollen> HandleAsync(
@@ -70,26 +39,34 @@ internal sealed class PollenListHandler : IPollenListHandler
         [EnumeratorCancellation] CancellationToken cancellationToken
     )
     {
-        DateOnly date = DateOnly.FromDateTime(DateTime.UtcNow.Date);
+        DateOnly date = DateOnly.FromDateTime(DateTime.UtcNow);
 
-        IEnumerable<WeatherForecastEntity> weatherForecasts =
-            await this._repository.WeatherForecasts.ListAsync(
+        IAsyncEnumerable<WeatherForecastEntity> weatherForecasts =
+            this._cache.ListAsync(
                 date,
                 latitude,
                 longitude,
                 cancellationToken
             );
-        
-        if (!weatherForecasts.Any())
+
+        if (await weatherForecasts.AnyAsync(cancellationToken))
         {
-            weatherForecasts =
-                await this
-                    .CreateAsync(latitude, longitude, cancellationToken)
-                    .ToListAsync(cancellationToken);
+            await foreach (WeatherForecastEntity weatherForecast in weatherForecasts)
+            {
+                yield return new Pollen(weatherForecast);
+            }
+
+            yield break;
         }
 
-        foreach (WeatherForecastEntity weatherForecast in weatherForecasts)
+        weatherForecasts =
+            this._weather
+                .ListForecastsAsync(latitude, longitude, cancellationToken)
+                .AsAsyncEnumerable();
+
+        await foreach (WeatherForecastEntity weatherForecast in weatherForecasts)
         {
+            await this._cache.AddAsync(weatherForecast, cancellationToken);
             yield return new Pollen(weatherForecast);
         }
     }

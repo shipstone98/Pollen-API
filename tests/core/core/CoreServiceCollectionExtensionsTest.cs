@@ -5,8 +5,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 
 using Shipstone.Pollen.Api.Core;
-using Shipstone.Pollen.Api.Core.Accounts;
 using Shipstone.Pollen.Api.Core.Pollen;
+using Shipstone.Pollen.Api.Core.Services;
 
 using Shipstone.Test.Mocks;
 
@@ -43,18 +43,16 @@ public sealed class CoreServiceCollectionExtensionsTest
         // Assert
         Assert.Same(services, result);
 
-        IEnumerable<Type> types = new Type[]
-        {
-            typeof (IAccountAuthenticateHandler),
-            typeof (IPollenListHandler)
-        };
+        ServiceDescriptor service =
+            collection.First(s =>
+                s.ServiceType.Equals(typeof (ICoordinateService)));
 
-        foreach (Type type in types)
-        {
-            ServiceDescriptor descriptor =
-                collection.First(s => s.ServiceType.Equals(type));
+        Assert.Equal(ServiceLifetime.Singleton, service.Lifetime);
 
-            Assert.Equal(ServiceLifetime.Scoped, descriptor.Lifetime);
-        }
+        ServiceDescriptor handler =
+            collection.First(s =>
+                s.ServiceType.Equals(typeof (IPollenListHandler)));
+
+        Assert.Equal(ServiceLifetime.Scoped, handler.Lifetime);
     }
 }

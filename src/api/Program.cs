@@ -1,4 +1,3 @@
-using System;
 using System.IO;
 using System.Net.Http;
 using System.Text.Json.Serialization;
@@ -15,13 +14,11 @@ using Shipstone.Extensions.Security;
 
 using Shipstone.Pollen.Api.Core;
 using Shipstone.Pollen.Api.Infrastructure.Data;
-using Shipstone.Pollen.Api.Infrastructure.Data.MySql;
 using Shipstone.Pollen.Api.Infrastructure.Weather;
 using Shipstone.Pollen.Api.Web;
 using Shipstone.Pollen.Api.WebApi;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
-String? connectionString = builder.Configuration.GetConnectionString("MySql");
 
 bool isNcsaCommonLoggingEnabled =
     builder.Configuration.GetValue<bool>("IsNcsaCommonLoggingEnabled");
@@ -40,27 +37,23 @@ builder.Services
     .AddPollenControllers();
 
 builder.Services
-    .AddIdentityExtensions(
-        builder.Configuration
-            .GetRequiredSection("Password")
-            .Bind
-    )
-    .AddSecurityExtensions(
-        builder.Configuration
-            .GetRequiredSection("Security")
-            .Bind
-    )
+    .AddDistributedMemoryCache()
+    .AddIdentityExtensions()
     .AddPollenCore()
     .AddPollenInfrastructureData()
-    .AddPollenInfrastructureDataMySql(connectionString)
     .AddPollenInfrastructureWeather(
         builder.Configuration
             .GetRequiredSection("Weather")
             .Bind
     )
+    .AddSingleton<IBasicAuthenticateHandler, PollenBasicAuthenticateHandler>()
     .AddSingleton<IPasswordHasher<IPasswordService>, PasswordHasher<IPasswordService>>()
     .AddSingleton<HttpMessageInvoker, HttpClient>()
-    .AddScoped<IBasicAuthenticateHandler, PollenBasicAuthenticateHandler>();
+    .Configure<AuthenticationOptions>(
+        builder.Configuration
+            .GetRequiredSection("Authentication")
+            .Bind
+    );
 
 if (builder.Environment.IsDevelopment())
 {

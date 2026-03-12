@@ -6,7 +6,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\core\core\Shipstone.Pollen.Api.Core.csproj" />
-    <ProjectReference Include="..\infrastructure\data\mysql\Shipstone.Pollen.Api.Infrastructure.Data.MySql.csproj" />
+    <ProjectReference Include="..\infrastructure\data\Shipstone.Pollen.Api.Infrastructure.Data.csproj" />
     <ProjectReference Include="..\infrastructure\weather\Shipstone.Pollen.Api.Infrastructure.Weather.csproj" />
     <ProjectReference Include="..\web\Shipstone.Pollen.Api.Web.csproj" />
   </ItemGroup>

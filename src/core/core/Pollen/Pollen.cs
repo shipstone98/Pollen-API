@@ -10,7 +10,6 @@ internal sealed class Pollen : IPollen
 
     PollenCategory IPollen.Category => this._weatherForecast.PollenCategory;
     Color IPollen.Color => this._weatherForecast.PollenColor;
-    long IPollen.Id => this._weatherForecast.Id;
     PollenType IPollen.Type => this._weatherForecast.PollenType;
 
     internal Pollen(WeatherForecastEntity weatherForecast) =>

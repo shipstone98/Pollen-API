@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using System.Net;
@@ -34,7 +33,7 @@ internal sealed class WeatherService : IWeatherService
         this._options = options?.Value ?? new();
     }
 
-    private async Task<IEnumerable<WeatherForecastEntity>> ListForecastsAsync(
+    private async Task<WeatherForecastEntity[]> ListForecastsAsync(
         double latitude,
         double longitude,
         CancellationToken cancellationToken
@@ -86,22 +85,23 @@ internal sealed class WeatherService : IWeatherService
             throw new WeatherException(MESSAGE);
         }
 
-        DateTime now = DateTime.UtcNow;
-        DateOnly date = DateOnly.FromDateTime(now);
+        DateOnly date = DateOnly.FromDateTime(DateTime.UtcNow);
 
-        return response._dailyInfo.SelectMany(di =>
-        {
-            if (di._pollenTypeInfo is null)
+        return response._dailyInfo
+            .SelectMany(di =>
             {
-                throw new WeatherException(MESSAGE);
-            }
+                if (di._pollenTypeInfo is null)
+                {
+                    throw new WeatherException(MESSAGE);
+                }
 
-            return di._pollenTypeInfo.Select(pti =>
-                WeatherService.Create(pti, now, date, latitude, longitude));
-        });
+                return di._pollenTypeInfo.Select(pti =>
+                    WeatherService.Create(pti, date, latitude, longitude));
+            })
+            .ToArray();
     }
 
-    Task<IEnumerable<WeatherForecastEntity>> IWeatherService.ListForecastsAsync(
+    Task<WeatherForecastEntity[]> IWeatherService.ListForecastsAsync(
         double latitude,
         double longitude,
         CancellationToken cancellationToken
@@ -113,7 +113,6 @@ internal sealed class WeatherService : IWeatherService
 
     private static WeatherForecastEntity Create(
         ForecastResponse.DailyInfoModel.PollenTypeInfoModel pollenTypeInfo,
-        DateTime now,
         DateOnly date,
         double latitude,
         double longitude
@@ -138,6 +137,7 @@ internal sealed class WeatherService : IWeatherService
                 pollenTypeInfo._indexInfo._color is null
                     ? new()
                     : Color.FromArgb(
+                        Byte.MaxValue,
                         (int) (pollenTypeInfo._indexInfo._color._red * 255),
                         (int) (pollenTypeInfo._indexInfo._color._green * 255),
                         (int) (pollenTypeInfo._indexInfo._color._blue * 255)
@@ -147,19 +147,17 @@ internal sealed class WeatherService : IWeatherService
         else
         {
             category = PollenCategory.None;
-            color = new();
+            color = Color.FromArgb(Byte.MaxValue, 0, 0, 0);
         }
 
         return new WeatherForecastEntity
         {
-            Created = now,
             Date = date,
             Latitude = latitude,
             Longitude = longitude,
             PollenCategory = category,
             PollenColor = color,
-            PollenType = type,
-            Updated = now
+            PollenType = type
         };
     }
 

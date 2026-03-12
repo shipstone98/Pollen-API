@@ -19,8 +19,8 @@ namespace Shipstone.Pollen.Api.CoreTest.Pollen;
 
 public sealed class PollenListHandlerTest
 {
+    private readonly MockCacheService _cache;
     private readonly IPollenListHandler _handler;
-    private readonly MockRepository _repository;
     private readonly MockWeatherService _weather;
 
     public PollenListHandlerTest()
@@ -32,13 +32,13 @@ public sealed class PollenListHandlerTest
         services._addAction = collection.Add;
         services._getEnumeratorFunc = collection.GetEnumerator;
         services.AddPollenCore();
-        MockRepository repository = new();
-        services.AddSingleton<IRepository>(repository);
+        MockCacheService cache = new();
+        services.AddSingleton<ICacheService>(cache);
         MockWeatherService weather = new();
         services.AddSingleton<IWeatherService>(weather);
         IServiceProvider provider = new MockServiceProvider(services);
+        this._cache = cache;
         this._handler = provider.GetRequiredService<IPollenListHandler>();
-        this._repository = repository;
         this._weather = weather;
     }
 
@@ -50,10 +50,6 @@ public sealed class PollenListHandlerTest
         // Arrange
         const double LATITUDE = 0.1234;
         const double LONGITUDE = 0.5678;
-        const long GRASS_POLLEN_ID = 12345;
-        const long TREE_POLLEN_ID = 23456;
-        const long WEED_POLLEN_ID = 34567;
-        DateTime now = DateTime.UtcNow;
         const PollenCategory GRASS_POLLEN_CATEGORY = PollenCategory.Moderate;
         const PollenCategory TREE_POLLEN_CATEGORY = PollenCategory.VeryLow;
         const PollenCategory WEED_POLLEN_CATEGORY = PollenCategory.VeryHigh;
@@ -67,18 +63,14 @@ public sealed class PollenListHandlerTest
         const byte WEED_POLLEN_COLOR_BLUE = 170;
         const byte WEED_POLLEN_COLOR_GREEN = 220;
 
-        this._repository._weatherForecastsFunc = () =>
+        this._cache._listFunc = (d, lat, lng) =>
         {
-            MockWeatherForecastRepository weatherForecasts = new();
-
-            weatherForecasts._listFunc = (d, lat, lng) =>
+            IEnumerable<WeatherForecastEntity> weatherForecasts =
                 new WeatherForecastEntity[]
                 {
                     new WeatherForecastEntity
                     {
-                        Created = now,
                         Date = d,
-                        Id = GRASS_POLLEN_ID,
                         Latitude = lat,
                         Longitude = lng,
                         PollenCategory = GRASS_POLLEN_CATEGORY,
@@ -88,14 +80,11 @@ public sealed class PollenListHandlerTest
                                 GRASS_POLLEN_COLOR_GREEN,
                                 GRASS_POLLEN_COLOR_BLUE
                             ),
-                        PollenType = PollenType.Grass,
-                        Updated = now
+                        PollenType = PollenType.Grass
                     },
                     new WeatherForecastEntity
                     {
-                        Created = now,
                         Date = d,
-                        Id = TREE_POLLEN_ID,
                         Latitude = lat,
                         Longitude = lng,
                         PollenCategory = TREE_POLLEN_CATEGORY,
@@ -105,14 +94,11 @@ public sealed class PollenListHandlerTest
                                 TREE_POLLEN_COLOR_GREEN,
                                 TREE_POLLEN_COLOR_BLUE
                             ),
-                        PollenType = PollenType.Tree,
-                        Updated = now
+                        PollenType = PollenType.Tree
                     },
                     new WeatherForecastEntity
                     {
-                        Created = now,
                         Date = d,
-                        Id = WEED_POLLEN_ID,
                         Latitude = lat,
                         Longitude = lng,
                         PollenCategory = WEED_POLLEN_CATEGORY,
@@ -122,12 +108,11 @@ public sealed class PollenListHandlerTest
                                 WEED_POLLEN_COLOR_GREEN,
                                 WEED_POLLEN_COLOR_BLUE
                             ),
-                        PollenType = PollenType.Weed,
-                        Updated = now
+                        PollenType = PollenType.Weed
                     },
                 };
 
-            return weatherForecasts;
+            return new MockAsyncEnumerable<WeatherForecastEntity>(weatherForecasts);
         };
 #endregion
 
@@ -154,7 +139,6 @@ public sealed class PollenListHandlerTest
             {
                 case PollenType.Grass:
                     pollen.AssertEqual(
-                        GRASS_POLLEN_ID,
                         PollenType.Grass,
                         GRASS_POLLEN_CATEGORY,
                         GRASS_POLLEN_COLOR_RED,
@@ -166,7 +150,6 @@ public sealed class PollenListHandlerTest
 
                 case PollenType.Tree:
                     pollen.AssertEqual(
-                        TREE_POLLEN_ID,
                         PollenType.Tree,
                         TREE_POLLEN_CATEGORY,
                         TREE_POLLEN_COLOR_RED,
@@ -178,7 +161,6 @@ public sealed class PollenListHandlerTest
 
                 case PollenType.Weed:
                     pollen.AssertEqual(
-                        WEED_POLLEN_ID,
                         PollenType.Weed,
                         WEED_POLLEN_CATEGORY,
                         WEED_POLLEN_COLOR_RED,
@@ -198,14 +180,12 @@ public sealed class PollenListHandlerTest
     public async Task TestHandleAsync_NotContains_Empty()
     {
         // Arrange
-        this._repository._weatherForecastsFunc = () =>
+        this._cache._listFunc = (_, _, _) =>
         {
-            MockWeatherForecastRepository weatherForecasts = new();
-
-            weatherForecasts._listFunc = (_, _, _) =>
+            IEnumerable<WeatherForecastEntity> weatherForecasts =
                 Array.Empty<WeatherForecastEntity>();
 
-            return weatherForecasts;
+            return new MockAsyncEnumerable<WeatherForecastEntity>(weatherForecasts);
         };
 
         this._weather._listForecastsAsync = (_, _) =>
@@ -244,16 +224,12 @@ public sealed class PollenListHandlerTest
         const byte WEED_POLLEN_COLOR_BLUE = 170;
         const byte WEED_POLLEN_COLOR_GREEN = 220;
 
-        this._repository._weatherForecastsFunc = () =>
+        this._cache._listFunc = (_, _, _) =>
         {
-            MockWeatherForecastRepository weatherForecasts = new();
-
-            weatherForecasts._listFunc = (_, _, _) =>
+            IEnumerable<WeatherForecastEntity> weatherForecasts =
                 Array.Empty<WeatherForecastEntity>();
 
-            long id = 0;
-            weatherForecasts._createAction = wf => wf.SetId(++ id);
-            return weatherForecasts;
+            return new MockAsyncEnumerable<WeatherForecastEntity>(weatherForecasts);
         };
 
         this._weather._listForecastsAsync = (lat, lng) =>
@@ -261,7 +237,6 @@ public sealed class PollenListHandlerTest
             {
                 new WeatherForecastEntity
                 {
-                    Created = now,
                     Date = date,
                     Latitude = lat,
                     Longitude = lng,
@@ -272,12 +247,10 @@ public sealed class PollenListHandlerTest
                             GRASS_POLLEN_COLOR_GREEN,
                             GRASS_POLLEN_COLOR_BLUE
                         ),
-                    PollenType = PollenType.Grass,
-                    Updated = now
+                    PollenType = PollenType.Grass
                 },
                 new WeatherForecastEntity
                 {
-                    Created = now,
                     Date = date,
                     Latitude = lat,
                     Longitude = lng,
@@ -288,12 +261,10 @@ public sealed class PollenListHandlerTest
                             TREE_POLLEN_COLOR_GREEN,
                             TREE_POLLEN_COLOR_BLUE
                         ),
-                    PollenType = PollenType.Tree,
-                    Updated = now
+                    PollenType = PollenType.Tree
                 },
                 new WeatherForecastEntity
                 {
-                    Created = now,
                     Date = date,
                     Latitude = lat,
                     Longitude = lng,
@@ -304,12 +275,11 @@ public sealed class PollenListHandlerTest
                             WEED_POLLEN_COLOR_GREEN,
                             WEED_POLLEN_COLOR_BLUE
                         ),
-                    PollenType = PollenType.Weed,
-                    Updated = now
+                    PollenType = PollenType.Weed
                 },
             };
 
-        this._repository._saveAction = () => { };
+        this._cache._addAction = _ => { };
 #endregion
 
         // Act
@@ -335,7 +305,6 @@ public sealed class PollenListHandlerTest
             {
                 case PollenType.Grass:
                     pollen.AssertEqual(
-                        1,
                         PollenType.Grass,
                         GRASS_POLLEN_CATEGORY,
                         GRASS_POLLEN_COLOR_RED,
@@ -347,7 +316,6 @@ public sealed class PollenListHandlerTest
 
                 case PollenType.Tree:
                     pollen.AssertEqual(
-                        1,
                         PollenType.Tree,
                         TREE_POLLEN_CATEGORY,
                         TREE_POLLEN_COLOR_RED,
@@ -359,7 +327,6 @@ public sealed class PollenListHandlerTest
 
                 case PollenType.Weed:
                     pollen.AssertEqual(
-                        1,
                         PollenType.Weed,
                         WEED_POLLEN_CATEGORY,
                         WEED_POLLEN_COLOR_RED,

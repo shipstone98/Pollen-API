@@ -1,8 +1,6 @@
 using System;
 using Microsoft.Extensions.DependencyInjection;
 
-using Shipstone.Pollen.Api.Infrastructure.Data.Repositories;
-
 namespace Shipstone.Pollen.Api.Infrastructure.Data;
 
 /// <summary>
@@ -19,10 +17,6 @@ public static class DataInfrastructureServiceCollectionExtensions
     public static IServiceCollection AddPollenInfrastructureData(this IServiceCollection services)
     {
         ArgumentNullException.ThrowIfNull(services);
-
-        return services
-            .AddScoped<IRepository, Repository>()
-            .AddScoped<IUserRepository, UserRepository>()
-            .AddScoped<IWeatherForecastRepository, WeatherForecastRepository>();
+        return services.AddSingleton<ICacheService, CacheService>();
     }
 }

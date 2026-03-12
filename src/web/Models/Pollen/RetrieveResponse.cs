@@ -9,7 +9,6 @@ internal sealed class RetrieveResponse
 
     public PollenCategory Category => this._pollen.Category;
     public Color Color => this._color;
-    public long Id => this._pollen.Id;
     public PollenType Type => this._pollen.Type;
 
     internal RetrieveResponse(IPollen pollen)

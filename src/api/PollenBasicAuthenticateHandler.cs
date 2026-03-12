@@ -3,44 +3,53 @@ using System.Collections.Generic;
 using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Options;
 
 using Shipstone.AspNetCore.Authentication.Basic;
-
-using Shipstone.Pollen.Api.Core.Accounts;
+using Shipstone.Extensions.Identity;
 
 namespace Shipstone.Pollen.Api.WebApi;
 
 internal sealed class PollenBasicAuthenticateHandler
     : IBasicAuthenticateHandler
 {
-    private readonly IAccountAuthenticateHandler _handler;
+    private readonly AuthenticationOptions _options;
+    private readonly IPasswordService _password;
 
-    public PollenBasicAuthenticateHandler(IAccountAuthenticateHandler handler) =>
-        this._handler = handler;
+    public PollenBasicAuthenticateHandler(
+        IPasswordService password,
+        IOptions<AuthenticationOptions>? options
+    )
+    {
+        this._options = options?.Value ?? new();
+        this._password = password;
+    }
 
-    async Task<IEnumerable<Claim>> IBasicAuthenticateHandler.HandleAsync(
+    Task<IEnumerable<Claim>> IBasicAuthenticateHandler.HandleAsync(
         String userId,
         String password,
         CancellationToken cancellationToken
     )
     {
+        if (!this._options._accounts.TryGetValue(
+            userId,
+            out String? passwordHash
+        ))
+        {
+            throw new BasicAuthenticateException();
+        }
+
         try
         {
-            await this._handler.HandleAsync(
-                userId,
-                password,
-                cancellationToken
-            );
+            this._password.Verify(passwordHash, password);
         }
 
-        catch (Exception ex)
+        catch (IncorrectPasswordException)
         {
-            throw new BasicAuthenticateException(
-                "The current user could not be authenticated.",
-                ex
-            );
+            throw new BasicAuthenticateException();
         }
 
-        return Array.Empty<Claim>();
+        IEnumerable<Claim> claims = Array.Empty<Claim>();
+        return Task.FromResult(claims);
     }
 }

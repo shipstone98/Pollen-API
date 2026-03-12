@@ -41,19 +41,10 @@ public sealed class DataInfrastructureServiceCollectionExtensionsTest
         // Assert
         Assert.Same(services, result);
 
-        IEnumerable<Type> types = new Type[]
-        {
-            typeof (IRepository),
-            typeof (IUserRepository),
-            typeof (IWeatherForecastRepository)
-        };
+        ServiceDescriptor descriptor =
+            collection.First(s =>
+                s.ServiceType.Equals(typeof (ICacheService)));
 
-        foreach (Type type in types)
-        {
-            ServiceDescriptor descriptor =
-                collection.First(s => s.ServiceType.Equals(type));
-
-            Assert.Equal(ServiceLifetime.Scoped, descriptor.Lifetime);
-        }
+        Assert.Equal(ServiceLifetime.Singleton, descriptor.Lifetime);
     }
 }

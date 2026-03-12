@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -22,7 +21,7 @@ public interface IWeatherService
     /// <exception cref="ArgumentOutOfRangeException"><c><paramref name="latitude" /></c> is less than -90 (negative ninety) -or- <c><paramref name="latitude" /></c> is greater than 90 (ninety) -or- <c><paramref name="longitude" /></c> is less than -180 (negative one-hundred and eighty) -or- <c><paramref name="longitude" /></c> is equal to or greater than 180 (one-hundred and eighty).</exception>
     /// <exception cref="OperationCanceledException">The cancellation token was canceled.</exception>
     /// <exception cref="WeatherException">The weather forecasts could not be listed.</exception>
-    Task<IEnumerable<WeatherForecastEntity>> ListForecastsAsync(
+    Task<WeatherForecastEntity[]> ListForecastsAsync(
         double latitude,
         double longitude,
         CancellationToken cancellationToken

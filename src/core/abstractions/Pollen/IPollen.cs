@@ -20,12 +20,6 @@ public interface IPollen
     Color Color { get; }
 
     /// <summary>
-    /// Gets the ID of the <see cref="IPollen" />.
-    /// </summary>
-    /// <value>The ID of the <see cref="IPollen" />.</value>
-    long Id { get; }
-
-    /// <summary>
     /// Gets the type of the <see cref="IPollen" />.
     /// </summary>
     /// <value>The <see cref="PollenType" /> of the <see cref="IPollen" />.</value>

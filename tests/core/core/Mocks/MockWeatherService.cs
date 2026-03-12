@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -10,19 +9,19 @@ namespace Shipstone.Pollen.Api.CoreTest.Mocks;
 
 internal sealed class MockWeatherService : IWeatherService
 {
-    internal Func<double, double, IEnumerable<WeatherForecastEntity>> _listForecastsAsync;
+    internal Func<double, double, WeatherForecastEntity[]> _listForecastsAsync;
 
     public MockWeatherService() =>
         this._listForecastsAsync = (_, _) =>
             throw new NotImplementedException();
 
-    Task<IEnumerable<WeatherForecastEntity>> IWeatherService.ListForecastsAsync(
+    Task<WeatherForecastEntity[]> IWeatherService.ListForecastsAsync(
         double latitude,
         double longitude,
         CancellationToken cancellationToken
     )
     {
-        IEnumerable<WeatherForecastEntity> result =
+        WeatherForecastEntity[] result =
             this._listForecastsAsync(latitude, longitude);
 
         return Task.FromResult(result);

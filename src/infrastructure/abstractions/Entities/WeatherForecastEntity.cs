@@ -8,7 +8,7 @@ namespace Shipstone.Pollen.Api.Infrastructure.Entities;
 /// <summary>
 /// Represents a weather forecast.
 /// </summary>
-public class WeatherForecastEntity : Entity<long>
+public class WeatherForecastEntity
 {
     private PollenCategory _pollenCategory;
     private PollenType _pollenType;

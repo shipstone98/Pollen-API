@@ -1,7 +1,6 @@
 using System;
 using Microsoft.Extensions.DependencyInjection;
 
-using Shipstone.Pollen.Api.Core.Accounts;
 using Shipstone.Pollen.Api.Core.Pollen;
 using Shipstone.Pollen.Api.Core.Services;
 
@@ -24,7 +23,6 @@ public static class CoreServiceCollectionExtensions
 
         return services
             .AddSingleton<ICoordinateService, CoordinateService>()
-            .AddScoped<IAccountAuthenticateHandler, AccountAuthenticateHandler>()
             .AddScoped<IPollenListHandler, PollenListHandler>();
     }
 }

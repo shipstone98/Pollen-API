@@ -16,6 +16,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\src\infrastructure\data\mysql\Shipstone.Pollen.Api.Infrastructure.Data.MySql.csproj" />
+    <ProjectReference Include="..\..\..\src\infrastructure\data\Shipstone.Pollen.Api.Infrastructure.Data.csproj" />
+    <ProjectReference Include="..\..\lib\Shipstone.Pollen.Api.Test.csproj" />
   </ItemGroup>
 </Project>

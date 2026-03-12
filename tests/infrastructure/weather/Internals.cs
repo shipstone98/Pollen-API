@@ -10,7 +10,7 @@ internal static class Internals
 {
     internal static void AssertEqual(
         this WeatherForecastEntity weatherForecast,
-        DateTime created,
+        DateOnly date,
         double latitude,
         double longitude,
         PollenCategory pollenCategory,
@@ -20,9 +20,6 @@ internal static class Internals
         int pollenColorBlue
     )
     {
-        DateOnly date = DateOnly.FromDateTime(created);
-        Assert.Equal(created, weatherForecast.Created);
-        Assert.Equal(DateTimeKind.Utc, weatherForecast.Created.Kind);
         Assert.Equal(date, weatherForecast.Date);
         Assert.Equal(latitude, weatherForecast.Latitude);
         Assert.Equal(longitude, weatherForecast.Longitude);
@@ -32,7 +29,5 @@ internal static class Internals
         Assert.Equal(pollenColorGreen, weatherForecast.PollenColor.G);
         Assert.Equal(pollenColorRed, weatherForecast.PollenColor.R);
         Assert.Equal(pollenType, weatherForecast.PollenType);
-        Assert.Equal(created, weatherForecast.Updated);
-        Assert.Equal(DateTimeKind.Utc, weatherForecast.Updated.Kind);
     }
 }

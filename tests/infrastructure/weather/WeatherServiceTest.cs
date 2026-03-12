@@ -16,6 +16,7 @@ using Shipstone.Pollen.Api.Infrastructure.Entities;
 using Shipstone.Pollen.Api.Infrastructure.Weather;
 
 using Shipstone.Pollen.Api.Infrastructure.WeatherTest.Mocks;
+using Shipstone.Pollen.Api.Test.Mocks;
 using Shipstone.Test.Mocks;
 
 namespace Shipstone.Pollen.Api.Infrastructure.WeatherTest;
@@ -247,10 +248,10 @@ public sealed class WeatherServiceTest
         WeatherForecastEntity weed =
             result.First(wf => wf.PollenType == PollenType.Weed);
 
-        DateTime created = grass.Created;
+        DateOnly date = DateOnly.FromDateTime(DateTime.UtcNow);
 
         grass.AssertEqual(
-            created,
+            date,
             LATITUDE,
             LONGITUDE,
             PollenCategory.Moderate,
@@ -261,7 +262,7 @@ public sealed class WeatherServiceTest
         );
 
         tree.AssertEqual(
-            created,
+            date,
             LATITUDE,
             LONGITUDE,
             PollenCategory.VeryLow,
@@ -272,7 +273,7 @@ public sealed class WeatherServiceTest
         );
 
         weed.AssertEqual(
-            created,
+            date,
             LATITUDE,
             LONGITUDE,
             PollenCategory.VeryHigh,
