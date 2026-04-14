@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Threading;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -32,7 +33,7 @@ internal sealed class PollenController : ControllerBase
         Object? response =
             handler
                 .HandleAsync(latitude, longitude, cancellationToken)
-                .SelectAsync((p, _) => new RetrieveResponse(p));
+                .Select((p, _) => new RetrieveResponse(p));
 
         return this.Ok(response);
     }

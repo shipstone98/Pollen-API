@@ -197,7 +197,7 @@ public sealed class PollenListHandlerTest
 
         // Assert
         await using IAsyncEnumerator<IPollen> enumerator =
-            result.GetAsyncEnumerator();
+            result.GetAsyncEnumerator(TestContext.Current.CancellationToken);
 
         Assert.False(await enumerator.MoveNextAsync());
     }

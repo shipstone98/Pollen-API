@@ -110,7 +110,7 @@ public sealed class CacheServiceTest
 
         // Assert
         await using IAsyncEnumerator<WeatherForecastEntity> enumerator =
-            result.GetAsyncEnumerator();
+            result.GetAsyncEnumerator(TestContext.Current.CancellationToken);
 
         Assert.True(await enumerator.MoveNextAsync());
         WeatherForecastEntity weatherForecast = enumerator.Current;
@@ -140,7 +140,7 @@ public sealed class CacheServiceTest
 
         // Assert
         await using IAsyncEnumerator<Object> enumerator =
-            result.GetAsyncEnumerator();
+            result.GetAsyncEnumerator(TestContext.Current.CancellationToken);
 
         Assert.False(await enumerator.MoveNextAsync());
     }
