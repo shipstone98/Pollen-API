@@ -58,22 +58,22 @@ builder.Services
 if (builder.Environment.IsDevelopment())
 {
     builder.Services.AddSingleton<IEncryptionService, StubEncryptionService>();
+}
 
-    if (isNcsaCommonLoggingEnabled)
-    {
-        TextWriter writer =
-            isNcsaCommonLoggingEnabled
-                ? new StreamWriter("log.txt", true)
-                : TextWriter.Null;
+if (isNcsaCommonLoggingEnabled)
+{
+    TextWriter writer =
+        isNcsaCommonLoggingEnabled
+            ? new StreamWriter("log.txt", true)
+            : TextWriter.Null;
 
-        builder.Services.AddNcsaCommonLogging(writer);
-    }
+    builder.Services.AddNcsaCommonLogging(writer);
 }
 
 WebApplication app = builder.Build();
 app.UseHttpsRedirection();
 
-if (app.Environment.IsDevelopment() && isNcsaCommonLoggingEnabled)
+if (isNcsaCommonLoggingEnabled)
 {
     app.UseNcsaCommonLogging();
 }
