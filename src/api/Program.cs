@@ -1,22 +1,19 @@
+using System;
 using System.IO;
 using System.Net.Http;
 using System.Text.Json.Serialization;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
+using Microsoft.IdentityModel.Tokens;
 
-using Shipstone.AspNetCore.Authentication.Basic;
 using Shipstone.AspNetCore.Http;
-using Shipstone.Extensions.Identity;
-using Shipstone.Extensions.Security;
 
 using Shipstone.Pollen.Api.Core;
 using Shipstone.Pollen.Api.Infrastructure.Data;
 using Shipstone.Pollen.Api.Infrastructure.Weather;
 using Shipstone.Pollen.Api.Web;
-using Shipstone.Pollen.Api.WebApi;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
@@ -24,8 +21,29 @@ bool isNcsaCommonLoggingEnabled =
     builder.Configuration.GetValue<bool>("IsNcsaCommonLoggingEnabled");
 
 builder.Services
-    .AddAuthentication(BasicAuthenticationDefaults.AuthenticationScheme)
-    .AddBasic();
+    .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        IConfigurationSection authentication =
+            builder.Configuration.GetRequiredSection("Authentication");
+
+        String? signingKey = authentication["SigningKey"];
+
+        if (signingKey is null)
+        {
+            throw new InvalidOperationException("The provided configuration does not contain a signing key.");
+        }
+
+        byte[] bytes = Convert.FromBase64String(signingKey);
+
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            IssuerSigningKey = new SymmetricSecurityKey(bytes),
+            ValidAudience = authentication["Audience"],
+            ValidIssuer = authentication["Issuer"],
+            ValidateIssuerSigningKey = true
+        };
+    });
 
 builder.Services
     .AddControllers()
@@ -38,7 +56,6 @@ builder.Services
 
 builder.Services
     .AddDistributedMemoryCache()
-    .AddIdentityExtensions()
     .AddPollenCore()
     .AddPollenInfrastructureData()
     .AddPollenInfrastructureWeather(
@@ -46,27 +63,11 @@ builder.Services
             .GetRequiredSection("Weather")
             .Bind
     )
-    .AddSingleton<IBasicAuthenticateHandler, PollenBasicAuthenticateHandler>()
-    .AddSingleton<IPasswordHasher<IPasswordService>, PasswordHasher<IPasswordService>>()
-    .AddSingleton<HttpMessageInvoker, HttpClient>()
-    .Configure<AuthenticationOptions>(
-        builder.Configuration
-            .GetRequiredSection("Authentication")
-            .Bind
-    );
-
-if (builder.Environment.IsDevelopment())
-{
-    builder.Services.AddSingleton<IEncryptionService, StubEncryptionService>();
-}
+    .AddSingleton<HttpMessageInvoker, HttpClient>();
 
 if (isNcsaCommonLoggingEnabled)
 {
-    TextWriter writer =
-        isNcsaCommonLoggingEnabled
-            ? new StreamWriter("log.txt", true)
-            : TextWriter.Null;
-
+    TextWriter writer = new StreamWriter("log.txt", true);
     builder.Services.AddNcsaCommonLogging(writer);
 }
 
